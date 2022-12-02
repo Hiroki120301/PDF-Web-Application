@@ -139,7 +139,7 @@ const Dashboard = () => {
             <Content style={{ padding: '0 50px' }}>
                 <Layout>
                     <Modal title="Document Preview" open={isPreviewOpen} onCancel={closePreview} footer={null} centered='true' width='1200'>
-                        <button type="primary" onClick={async () => {await handleMerge(text);}}>Merge</button>
+                        <button type="primary" onClick={handleMerge}>Merge</button>
                         <embed src={pdfString} width="1200" height="600"></embed>
                     </Modal>
                 <Divider />
