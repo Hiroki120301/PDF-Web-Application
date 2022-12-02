@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import Navbar from "./Navbar";
 import { Auth, Amplify, Storage } from 'aws-amplify';
 import { Breadcrumb, Layout, Button, Modal, Space, Divider, Row, Col, Table, Tag } from 'antd';
+import { PDFDocument } from 'pdf-lib';
 const { Header, Footer, Sider, Content } = Layout;
 Storage.configure({ level: 'protected' });
 
@@ -40,6 +41,14 @@ const Dashboard = () => {
         setPdfString(url)
         setLoadedKey(e)
         setIsPreviewOpen(true)
+    }
+
+    async function handleMerge(e) {
+        const result = await Storage.get(e, {download: true});
+        const url = URL.createObjectURL(result.Body);
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer());
+        const pdfDoc1 = await PDFDocument.load(arrayBuffer);
+        /* Add PDF filing */
     }
 
     async function handleUpload(e) {
@@ -130,6 +139,7 @@ const Dashboard = () => {
             <Content style={{ padding: '0 50px' }}>
                 <Layout>
                     <Modal title="Document Preview" open={isPreviewOpen} onCancel={closePreview} footer={null} centered='true' width='1200'>
+                        <Button type="primary" onClick={async () => {await handleMerge(text);}}>{text}</Button>
                         <embed src={pdfString} width="1200" height="600"></embed>
                     </Modal>
                 <Divider />
