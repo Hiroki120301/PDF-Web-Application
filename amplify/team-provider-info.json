@@ -19,5 +19,23 @@
         "s3csds393projectstoraged95fa87d": {}
       }
     }
+  },
+  "ktest": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-csds393projectstorag-ktest-223126-authRole",
+      "UnauthRoleArn": "arn:aws:iam::608444045676:role/amplify-csds393projectstorag-ktest-223126-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::608444045676:role/amplify-csds393projectstorag-ktest-223126-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-csds393projectstorag-ktest-223126-deployment",
+      "UnauthRoleName": "amplify-csds393projectstorag-ktest-223126-unauthRole",
+      "StackName": "amplify-csds393projectstorag-ktest-223126",
+      "StackId": "arn:aws:cloudformation:us-east-1:608444045676:stack/amplify-csds393projectstorag-ktest-223126/f9782ec0-72ba-11ed-a72f-0a83177826dd",
+      "AmplifyAppId": "d2o5kzjtnaht1w"
+    },
+    "categories": {
+      "auth": {
+        "csds393projectf9111d1c": {}
+      }
+    }
   }
 }
