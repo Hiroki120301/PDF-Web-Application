@@ -22,6 +22,7 @@ const Dashboard = () => {
     const [secondPDF, setsecondPDF] = useState(null);
     const [resultPDF, setResultPDF] = useState(null);
     const [resultPDFTwo, setResultPDFTwo] = useState(null);
+    const [totalPages, setTotalPages] = useState(0);
     const [loaded, setLoaded] = useState(0);
     const [loadedKey, setLoadedKey] = useState(0);
     const [pdfList, setPdfList] = useState(new Array());
@@ -69,6 +70,11 @@ const Dashboard = () => {
         setIsPreviewOpen(true)
     }
 
+    async function handleMergeTarget(e){
+        setMergeTargetKey(e)
+        return mergeTargetKey
+    }
+
     async function handleEdit(isMerge) {
         const url = pdfString
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer());
@@ -80,12 +86,14 @@ const Dashboard = () => {
             setIsSplitOpen(true)
     }
 
-    async function handleMerge() {       
+    async function handleMerge(e) {       
         const mergedPdf = await PDFDocument.create();
 
-        /* Uses deafult for now- change to find table selection */
-        const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf' 
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer());
+        const result = await Storage.get(e, {download: true});
+        const url = URL.createObjectURL(result.Body);
+        setPdfString(url)
+        const mergeUrl = pdfString
+        const arrayBuffer = await fetch(mergeUrl).then(res => res.arrayBuffer());
         const pdfDoc = await PDFDocument.load(arrayBuffer);
         setsecondPDF(pdfDoc)
 
@@ -98,17 +106,23 @@ const Dashboard = () => {
         const mergedPdfFile = await mergedPdf.save();
         setResultPDF(mergedPdfFile)
 
-        const file = resultPDF
-        file.name = loadedKey + "_merged"
-        let key = file.name
-        console.log("key: " + key)
+        //upload merged file
+        console.log(resultPDF)
+        const file = resultPDF;
+        file.name = loadedKey + " merged"
+        const user = await Auth.currentAuthenticatedUser();
+        let key = user.username +'/' + file.name
+        key = await nameDocument(key)
+        //console.log("tags @ upload: " + tag1 + ", " +tag2 + ", " + tag3)
         try {
-            await Storage.put(file.name, file, {
+            await Storage.put(key, file, {
               contentType: "application/pdf", // contentType is optional
+                
             });
           } catch (error) {
             console.log("Error uploading file: ", error);
           }
+
         setIsMergeOpen(false)
         setIsPreviewOpen(false)
         handleCancel()
@@ -118,7 +132,7 @@ const Dashboard = () => {
         //console.log(e)
         const subDocument1 = await PDFDocument.create();
         const subDocument2 = await PDFDocument.create();
-        const totalPages = firstPDF.getPageCount();
+        setTotalPages(firstPDF.getPageCount())
         if(splitInput >= totalPages || splitInput <= 0){
             setIsSplitOpen(false)
             setIsPreviewOpen(false)
@@ -141,24 +155,27 @@ const Dashboard = () => {
             setResultPDFTwo(mergedPDFHalf2)
 
             const file = resultPDF
-            file.name = loadedKey + "_split1"
-            let key = file.name  
             const file2 = resultPDFTwo
-            file2.name = loadedKey + "_split2"
-            let key2 = file2.name
-            console.log("key: " + key)
-            console.log("key: " + key2)
+            console.log(file.name)
+            file.name = loadedKey + "_head"
+            file2.name = loadedKey + "_tail"
+            const user = await Auth.currentAuthenticatedUser();
+            let key = user.username +'/' + file.name
+            let key2 = user.username +'/' + file2.name
+            key = await nameDocument(key)
+            key2 = await nameDocument(key2)
+            //console.log("tags @ upload: " + tag1 + ", " +tag2 + ", " + tag3)
             try {
-                await Storage.put(file.name, file, {
-                contentType: "application/pdf", // contentType is optional
+                await Storage.put(key, file, {
+                contentType: "application/pdf", // contentType is optional    
                 });
-                await Storage.put(file2.name, file2, {
-                    contentType: "application/pdf", // contentType is optional
+                await Storage.put(key2, file2, {
+                    contentType: "application/pdf", // contentType is optional    
                     });
             } catch (error) {
                 console.log("Error uploading file: ", error);
             }
-            
+
             setIsSplitOpen(false)
             setIsPreviewOpen(false)
             handleCancel()
@@ -290,6 +307,7 @@ const Dashboard = () => {
             const lastChar = intitialKey.substring(intitialKey.length -1)
             const integerValue = parseInt(lastChar)
             let newName = ""
+            //Maybe add place for merge split naming
             if (isNaN(integerValue)) {
                 newName = intitialKey + " 1"
             } else {
@@ -297,7 +315,7 @@ const Dashboard = () => {
                 let num = integerValue + 1
                 num = num.toString()
                 newName = newName + num
-            }
+            }   
             console.log("rerun with name: " + newName)
             return nameDocument(newName)
         } else {
@@ -343,15 +361,18 @@ const Dashboard = () => {
             <Content style={{ padding: '0 50px' }}>
                 <Layout>
                     <Modal title="Document Preview" open={isPreviewOpen} onCancel={closePreview} footer={null} centered='true' width='1200'>
-                        <Col span={4}>
-                            <Button type="primary" onClick={async () => {await handleEdit(true);}}>Merge</Button>
-                        </Col>
-                        <Col span={4}>
-                            <Button type="primary" onClick={async () => {await handleEdit();}}>Split</Button>
-                        </Col>
-                        <br/>
-                        <br/>
-                        <Row><Button onClick={showShareDialog}>Share</Button></Row><Divider />
+                        <Row>
+                            <Col span={4}>
+                                <Button onClick={showShareDialog}>Share</Button>
+                            </Col>
+                            <Col span={4}>
+                                <Button onClick={async () => {await handleEdit(true);}}>Merge</Button>
+                            </Col>
+                            <Col span={4}>
+                                <Button onClick={async () => {await handleEdit();}}>Split</Button>
+                            </Col>
+                        </Row>
+                        <Divider />
                         <Modal title="Share" open={shareDialog} onCancel={closeShareDialog} footer={null} centered='true' width='120'>
                             <div>
                                 <div>{shareMsg}</div>
@@ -389,14 +410,14 @@ const Dashboard = () => {
                             title: 'Name',
                             dataIndex: 'name',
                             key: 'name',
-                            render: (text) => <Button type="primary" onClick={async () => {await handleMerge();}}>{text}</Button>
+                            render: (text, record) => <Button type="primary" onClick={async () => {await handleMerge(record.s3key);}}>{text}</Button>
                         },
                         {
                             title: 'Last Edited:',
                             dataIndex: 'lastedit',
                             key: 'lastedit',
                         }
-                    ]} dataSource={pdflist} />
+                    ]} dataSource={pdfList} />
                     </Modal>
                 <Divider />
                 <Modal title="Split after page..." open={isSplitOpen} onCancel={closeSplit || closePreview} footer={null} centered='true' width='1200'>
@@ -444,7 +465,7 @@ const Dashboard = () => {
     ]} dataSource={pdfList} /> </div>
                 </Layout>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Luis Segovia Fan Club ©2022 Created by James Redding & Maxwell Ryan</Footer>
+            <Footer style={{ textAlign: 'center' }}>Luis Segovia Fan Club ©2022 Created by James Redding, Maxwell Ryan, Hiroki Nakayama, Tiger Tian, Kerry Nettles, and Kieran Williams</Footer>
         </Layout>
         </>
     )
