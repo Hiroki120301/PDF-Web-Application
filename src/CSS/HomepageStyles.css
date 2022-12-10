@@ -37,7 +37,7 @@
     text-align: center;
 }
 .hero-button:hover {
-    background: #63b6b8
+    background: #88BC9E;
 }
 .hero-button:focus {
     outline: 1px solid #fff;
@@ -45,10 +45,10 @@
 }
 
 .hero-section {
-  margin-top: 5vh;
-  margin-right: 20vh;
-  margin-left: 20vh;
-  margin-bottom: 0px;
+  padding-top: 5vh;
+  padding-right: 20vh;
+  padding-left: 20vh;
+  padding-bottom: 1vh;
 }
 
 .hero-section-title {

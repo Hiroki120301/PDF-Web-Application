@@ -34,11 +34,8 @@ const Homepage = ({}) => {
                         </button>
                     </div>
                 </div>
-                <div className='hero-section'>
-                    <p className='hero-section-title'>Product Overview</p>
-                    some info about the project and how to use the product or something
-                </div>
-                <div className='hero-section'>
+                
+                <div className='hero-section' style={{ backgroundColor: '#88BC9E' }}>
                     <p className='hero-section-title'>Meet the Team</p>
                     <Row gutter={[16, 24]}>
                     <Col span={8}>
@@ -128,7 +125,7 @@ const Homepage = ({}) => {
                     </Row>
                 </div>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Luis Segovia Fan Club ©2022 Created by James Redding, Maxwell Ryan, Kerry Nettles, Tiger Tian, Hiroki Nakayama, & Kieran Williams</Footer>
+            <Footer style={{ backgroundColor: '#b6d7a8', textAlign: 'center' }}>Luis Segovia Fan Club ©2022 Created by James Redding, Maxwell Ryan, Kerry Nettles, Tiger Tian, Hiroki Nakayama, & Kieran Williams</Footer>
         </Layout>
         </>
     )
